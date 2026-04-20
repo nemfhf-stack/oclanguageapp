@@ -521,7 +521,7 @@ function renderQ(){
   if(q.mode==="audio_mc"){
     html+='<div class="mode-badge">Listen &amp; choose</div>';
     html+='<div class="audio-player"><div class="ap-top">'+
-      '<button class="play-btn" id="play-btn-main" onclick="speak(''+q.w+'',''+S.lang+'',spd)">â–¶</button>'+
+      '<button class="play-btn" id="play-btn-main" onclick="doPlay()">â–¶</button>'+
       '<div class="ap-info"><div class="ap-lang">'+S.lang.toUpperCase()+'</div>'+
       '<div class="ap-word">'+q.w+'</div><div class="ap-ipa">/'+q.ipa+'/</div></div></div>'+
       '<div class="speed-row">'+
@@ -532,7 +532,7 @@ function renderQ(){
     var wrong=shuf(vocab.filter(function(v){return v.w!==q.w;})).slice(0,3).map(function(v){return v.t;});
     var opts=shuf([q.t].concat(wrong));
     html+='<div class="choices">'+opts.map(function(o){
-      return '<button class="ch" onclick="pickMC(this,''+o.replace(/'/g,"\'")+'',''+q.t.replace(/'/g,"\'")+'')">'+o+"</button>";
+      return '<button class="ch" data-ans="'+encodeURIComponent(o)+'" data-cor="'+encodeURIComponent(q.t)+'" onclick="pickMCBtn(this)">'+o+'</button>';
     }).join("")+"</div>";
     bot.innerHTML="";
     setTimeout(function(){speak(q.w,S.lang,0.8);},400);
@@ -541,7 +541,7 @@ function renderQ(){
     html+='<div class="q-word'+(q.w.length>14?" sm":"")+'">'+q.w+"</div>";
     html+='<div style="font-size:13px;color:var(--tx2);margin-bottom:1rem">'+q.t+"</div>";
     html+='<div class="audio-player"><div class="ap-top">'+
-      '<button class="play-btn" id="play-btn-main" onclick="speak(''+q.w+'',''+S.lang+'',spd)">â–¶</button>'+
+      '<button class="play-btn" id="play-btn-main" onclick="doPlay()">â–¶</button>'+
       '<div class="ap-info"><div class="ap-lang">Pronunciation</div>'+
       '<div class="ap-ipa" style="font-size:14px;margin-top:4px">/'+q.ipa+'/</div></div></div>'+
       '<div class="speed-row">'+
@@ -565,7 +565,7 @@ function renderQ(){
     html+='<div class="mode-badge">Type the translation</div>';
     html+='<div class="q-word'+(q.w.length>14?" sm":"")+'">'+q.w+"</div>";
     html+='<div class="audio-player" style="margin:0.75rem 0"><div class="ap-top">'+
-      '<button class="play-btn" id="play-btn-main" onclick="speak(''+q.w+'',''+S.lang+'',spd)" style="width:42px;height:42px;font-size:16px">â–¶</button>'+
+      '<button class="play-btn" id="play-btn-main" onclick="doPlay()" style="width:42px;height:42px;font-size:16px">â–¶</button>'+
       '<div class="ap-info"><div class="ap-lang">Tap to hear</div><div class="ap-ipa">/'+q.ipa+'/</div></div>'+
     "</div></div>";
     html+='<input class="t-input" id="t-in" placeholder="English translation..." oninput="onType()" onkeydown="if(event.key==='Enter')checkAns()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">';
@@ -574,7 +574,7 @@ function renderQ(){
     html+='<div class="mode-badge">Build the translation</div>';
     html+='<div class="q-word'+(q.w.length>14?" sm":"")+'">'+q.w+"</div>";
     html+='<div class="audio-player" style="margin:0.75rem 0"><div class="ap-top">'+
-      '<button class="play-btn" id="play-btn-main" onclick="speak(''+q.w+'',''+S.lang+'',spd)" style="width:42px;height:42px;font-size:16px">â–¶</button>'+
+      '<button class="play-btn" id="play-btn-main" onclick="doPlay()" style="width:42px;height:42px;font-size:16px">â–¶</button>'+
       '<div class="ap-info"><div class="ap-lang">Tap to hear</div><div class="ap-ipa">/'+q.ipa+'/</div></div>'+
     "</div></div>";
     var tWords=q.t.split(" ");
@@ -712,6 +712,13 @@ function showResult(){
   document.getElementById("rs-acc").textContent=acc+"%";
   document.getElementById("rs-str").textContent="ðŸ”¥"+S.streak;
   show("s-result");
+}
+
+function doPlay(){speak(qs[qi].w,S.lang,spd);}
+function pickMCBtn(btn){
+  var o=decodeURIComponent(btn.getAttribute("data-ans"));
+  var c=decodeURIComponent(btn.getAttribute("data-correct"));
+  pickMC(btn,o,c);
 }
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
 load();
